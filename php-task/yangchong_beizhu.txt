@@ -1,0 +1,1 @@
+nohup /www/wdlinux/phps/56/bin/php run.php start --log=false >/dev/null 2>/dev/null &
