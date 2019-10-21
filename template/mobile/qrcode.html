@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-cn" class="hb-loaded">
+<head>
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0"/>
+    <title>预约信息</title>
+    <link rel="stylesheet" href="../addons/weihu_menpiao/static/sm.min.css">
+    <style>
+        .list-block li{
+            border-top:1px solid #e4e4e4;
+        }
+    </style>
+</head>
+
+<body>
+
+<header class="bar bar-nav">
+    <h1 class='title'>预约信息</h1>
+</header>
+
+<div class="content">
+
+        <div class="list-block">
+            <ul>
+                <li>
+                    <div class="item-content">
+                        <div class="item-media"><i class="icon icon-form-name"></i></div>
+                        <div class="item-inner">
+                            <div class="item-title label">订单号</div>
+                            <div class="item-input">
+                                <input type="text" name="name" readonly value="{$memberlog['ordernum']}" >
+                            </div>
+                        </div>
+                    </div>
+                </li>
+
+                <li>
+                    <div class="item-content">
+                        <div class="item-media"><i class="icon icon-form-name"></i></div>
+                        <div class="item-inner">
+                            <div class="item-title label">状态</div>
+                            <div class="item-input" id="status" style="color:  {php echo $memberlog['status']==0?'deepskyblue':($memberlog['status']==1?'#4cd964':'red')}" >
+                                {php echo $memberlog['status']==0?'已预约':($memberlog['status']==1?'已完成':'已取消')}
+                            </div>
+                        </div>
+                    </div>
+                </li>
+
+            </ul>
+        </div>
+    {if $memberlog['status']==0}
+    <div class="content-block">
+        <div class="row">
+        <div class="col-50"><a href="javascript:status(1);" class="button button-big button-fill button-success">完成</a></div>
+        <div class="col-50"><a href="javascript:status(2);" class="button button-big button-fill button-warning" >取消</a></div>
+        </div>
+    </div>
+    {/if}
+</div>
+
+<script type='text/javascript' src='../addons/weihu_menpiao/static/zepto.min.js' charset='utf-8'></script>
+<script type='text/javascript' src='../addons/weihu_menpiao/static/sm.min.js' charset='utf-8'></script>
+<script>
+function status(type) {
+    Zepto.confirm('是否确定?', function () {
+        var formData = new FormData();
+        formData.append("id",{$memberlog['id']});
+        formData.append("type",type);
+
+        $.ajax({
+            type: "POST",   //提交的方法
+            dataType:'json',
+            url:"{php echo $this->createMobileUrl('changememberlog')}", //提交的地址
+            data:formData,// 序列化表单值
+            async: false,
+            processData : false, // 使数据不做处理
+            contentType : false, // 不要设置Content-Type请求头
+            error: function(request) {  //失败的话
+                Zepto.alert("网络错误");
+            },
+            success: function(data) {  //成功
+                if(data.status==1){
+                    Zepto.alert('状态修改成功!',function () {
+                        location.href="{php echo $this->createMobileUrl('index2')}";
+                    });
+                }else {
+                    Zepto.alert(data.msg)
+                }
+            }
+        });
+    })
+}
+
+</script>
+</body>
+
+</html>

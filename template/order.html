@@ -1,0 +1,124 @@
+{template 'common/header'}
+
+<ul class="nav nav-tabs">
+    <form action=""  method="post" >
+        <input type="text" name="keyword" class="form-control" style="width:25%;float:left;" value="{$_GPC['keyword']}" placeholder="输入订单号" >
+
+        {php echo tpl_form_field_daterange('time', array('start'=>date('Y-m-d',(empty($_GPC['time']['start'])?strtotime('-1 month'):strtotime($_GPC['time']['start']))),'end'=>date('Y-m-d',(empty($_GPC['time']['end'])?strtotime('+1 day'):strtotime($_GPC['time']['end'])))));}
+
+        <button type="submit" class="btn btn-default" >搜索</button>
+    </form>
+
+</ul>
+
+<div class="main">
+    {if !empty($_GPC['mid'])}
+    <a href="{php echo $this->createWebUrl('member')}" class="btn btn-default pull-left">返回</a>
+    {/if}
+    <a href="{php echo $this->createWebUrl('memberlogexport',array('mid'=>$_GPC['mid']))}" class="btn btn-primary pull-left" style="margin-left: 20px" ><span>+</span>导出</a>
+    <div style="padding: 15px;">
+        <table class="table table-hover table-striped table-condensed">
+            <thead class="navbar-inner">
+            <tr>
+                <th style="text-align: center;">订单号</th>
+                {if empty($_GPC['mid'])}
+                <th style="text-align: center;">姓名</th>
+                <th style="text-align: center;">手机号</th>
+                <th style="text-align: center;">生日</th>
+                {/if}
+                <th style="text-align: center;">医院/科室</th>
+                <th style="text-align: center;">卡号</th>
+                <th style="text-align: center;">预约时间</th>
+                <th style="text-align: center;">状态</th>
+                <th style="text-align: center;">提交时间</th>
+                <th style="text-align: center;">核销员姓名</th>
+                <th style="text-align: center;">核销员手机号</th>
+                <th style="text-align: center;">备注</th>
+                <th style="text-align: center;">操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            {loop $list $item}
+            <tr>
+                <td style="text-align: center;">{$item['ordernum']}</td>
+                {if empty($_GPC['mid'])}
+                <td style="text-align: center;">{$item['member']['name']}</td>
+                <td style="text-align: center;">{$item['member']['mobile']}</td>
+                <td style="text-align: center;">{php echo $item['member']['birthday']?date('Y-m-d',$item['member']['birthday']):'未设置'}</td>
+                {/if}
+                <td style="text-align: center;">{$hospital[$item['hid']]['name']}<br/>{$kscate[$item['ksid']]['name']}-{$kscate[$item['ksid2']]['name']}</td>
+                <td style="text-align: center;">{$item['membercard']['cardnum']}</td>
+                <td style="text-align: center;">{php echo date('Y-m-d H:i',$item['seektime'])}</td>
+                <td style="text-align: center;">{php echo $item['status']==0?'已预约':($item['status']==1?'已完成':'已取消')}</td>
+                <td style="text-align: center;">{php echo date('Y-m-d H:i',$item['createtime'])}</td>
+                <td style="text-align: center;">{$item['member2']['name']}</td>
+                <td style="text-align: center;">{$item['member2']['mobile']}</td>
+                <td style="text-align: center;">{$item['content']}</td>
+                <td style="text-align: center;">
+                    <a href="javascript:cupmodal({$item['id']},'{$item['content']}');"
+                       title="编辑" class="btn btn-small">编辑</a>
+                    {if $item['status']==0}
+                    <a href="javascript:status({$item['id']},1);"
+                       title="完成" class="btn btn-small">完成</a>
+                    <a href="javascript:status({$item['id']},2);"
+                       title="取消" class="btn btn-small">取消</a>
+                    {/if}
+                </td>
+            </tr>
+            {/loop}
+            </tbody>
+
+        </table>
+        {$pager}
+    </div>
+
+</div>
+
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+     aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"
+                        aria-hidden="true">×
+                </button>
+            </div>
+            <form action="" method="post" class="form-horizontal">
+                <div class="modal-body" id="mo-content" >
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">备注</label>
+                        <div class="col-sm-8 col-xs-6" >
+                            <textarea name="content" class="form-control" ></textarea>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <input type="hidden" name="id" value="" >
+                    <input type="hidden" name="change" value="1">
+                    <button type="submit" class="btn btn-primary">提交更改</button>
+                </div>
+            </form>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<script>
+    function cupmodal(id,content) {
+            $("input[name='id']").val(id);
+            $("textarea[name='content']").val(content);
+
+        $('#myModal').modal();
+    }
+
+    function status(id,type) {
+        if(confirm('是否确定？')){
+            location.href="{php echo $this->createWebUrl('changememberlog',array('mid'=>$_GPC['mid']))}&id="+id+"&type="+type;
+        }
+    }
+</script>
+
+{template 'common/footer'}

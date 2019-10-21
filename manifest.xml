@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns="http://20190709.jnweishangjia.com" versionCode="2.0">
+    <application setting="true">
+        <name><![CDATA[微狐预约]]></name>
+        <identifie><![CDATA[weihu_yuyue]]></identifie>
+        <version><![CDATA[1.0]]></version>
+        <type><![CDATA[business]]></type>
+        <ability><![CDATA[微狐预约]]></ability>
+        <description><![CDATA[微狐预约]]></description>
+        <author><![CDATA[微狐网络]]></author>
+        <url><![CDATA[http://20190709.jnweishangjia.com]]></url>
+    </application>
+    <platform>
+        <subscribes>
+        </subscribes>
+        <handles>
+            <message type="text" />
+        </handles>
+    </platform>
+    <bindings>
+        <cover>
+            <entry title="管理员入口" do="index2" />
+            <entry title="用户入口" do="menu" />
+            <entry title="个人中心" do="index" />
+            <entry title="实名入口" do="shiming" />
+            <entry title="购卡入口" do="membercard" />
+            <entry title="激活实体卡入口" do="entitycard" />
+            <entry title="挂号入口" do="guahao" />
+        </cover>
+        <menu>
+            <entry title="用户管理" do="member" direct="false" />
+            <entry title="全部办卡记录" do="membercard" direct="false" />
+            <entry title="医院管理" do="hospital" direct="false" />
+            <entry title="卡管理" do="card" direct="false" />
+            <entry title="订单管理" do="order" direct="false" />
+            <entry title="核销员管理" do="hexiao" direct="false" />
+            <entry title="系统设置" do="set" direct="false" />
+        </menu>
+    </bindings>
+    <install></install>
+    <uninstall></uninstall>
+    <upgrade></upgrade>
+</manifest>

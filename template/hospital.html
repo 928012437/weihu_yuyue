@@ -1,0 +1,159 @@
+{template 'common/header'}
+<script type="text/javascript" src="../addons/weihu_yuyue/static/area/cascade.js"></script>
+
+<div class="main">
+    <a href="javascript:cupmodal(0);" class="btn btn-primary pull-left"><span>+</span>添加医院</a>
+    <div style="padding: 15px;">
+        <table class="table table-hover table-striped table-condensed">
+            <thead class="navbar-inner">
+            <tr>
+                <th style="text-align: center;">名称</th>
+                <th style="text-align: center;">省市区</th>
+                <th style="text-align: center;">定位</th>
+                <th style="text-align: center;">备注</th>
+                <th style="text-align: center;">状态</th>
+                <th style="text-align: center;">操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            {loop $list $item}
+            <tr>
+                <td style="text-align: center;">{$item['name']}</td>
+                <td style="text-align: center;">{$item['province']}{$item['city']}{$item['area']}</td>
+                <td style="text-align: center;">{$item['lng']}，{$item['lat']}</td>
+                <td style="text-align: center;">{$item['content']}</td>
+                <td style="text-align: center;">{php echo empty($item['status'])?'显示':'隐藏'}</td>
+                <td style="text-align: center;">
+                    <a href="{php echo $this->createWebUrl('kscate',array('hid'=>$item['id']))}"
+                       title="管理科室" class="btn btn-small">管理科室</a>
+                    <a href="javascript:cupmodal({$item['id']},'{$item['name']}','{$item['province']}','{$item['city']}','{$item['area']}','{$item['lng']}','{$item['lat']}','{$item['content']}','{$item['status']}');"
+                       title="编辑" class="btn btn-small">编辑</a>
+                    <a href="javascript:del({$item['id']});"
+                       title="删除" class="btn btn-small">删除</a>
+                </td>
+            </tr>
+            {/loop}
+            </tbody>
+
+        </table>
+        {$pager}
+    </div>
+
+</div>
+
+<!-- 模态框（Modal） -->
+<style>
+    .modal-backdrop{
+        z-index: 400;
+    }
+    #myModal{
+        z-index: 500;
+    }
+    .we7-modal-dialog .modal-content, .modal-dialog .modal-content{
+        max-height: 1000px;
+    }
+</style>
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+     aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"
+                        aria-hidden="true">×
+                </button>
+            </div>
+            <form action="" method="post" class="form-horizontal">
+                <div class="modal-body" id="mo-content" >
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label must">名称</label>
+                        <div class="col-sm-4 col-xs-6" >
+                            <input type="text" name="name" id="name" class="form-control" value="" data-rule-required="true" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">省市区</label>
+                        <div class="col-xs-8" >
+                            <p>
+                                <select id="sel-provance" name="province" onChange="selectCity();" class="select form-control select-group" style="width:123px;display:inline;">
+                                    <option value="" selected="true">省/直辖市</option>
+                                </select>
+                                <select id="sel-city" name="city" onChange="selectcounty(0)" class="select form-control select-group" style="width:135px;display:inline;">
+                                    <option value="" selected="true">请选择</option>
+                                </select>
+                                <select id="sel-area" name="area" onChange="selectstreet(0)" class="select form-control select-group" style="width:130px;display:inline;">
+                                    <option value="" selected="true">请选择</option>
+                                </select>
+
+                            </p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">定位</label>
+                        <div class="col-xs-8" >
+                            {php echo tpl_form_field_coordinate('map',array('lng'=>'','lat'=>''))}
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">备注</label>
+                        <div class="col-sm-8 col-xs-6" >
+                            <textarea name="content" class="form-control" ></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">状态</label>
+                        <div class="col-sm-4 col-xs-6" >
+                            <label class="radio-inline"><input type="radio" name="status" value="0" aria-invalid="false" class="valid">显示</label>
+                            <label class="radio-inline"><input type="radio" name="status" value="1" aria-invalid="false" class="valid">隐藏</label>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <input type="hidden" name="id" value="" >
+                    <button type="submit" class="btn btn-primary">提交更改</button>
+                </div>
+            </form>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<script>
+    function cupmodal(id,name,province,city,area,lng,lat,content,status) {
+        if(id==0){
+            $("input[name='id']").val('');
+            $("input[name='name']").val('');
+            $("input[name='map[lng]']").val('');
+            $("input[name='map[lat]']").val('');
+            $("textarea[name='content']").val('');
+            $("input[name='status']").eq(0).prop('checked',1);
+            cascdeInit();
+            $('#sel-city').html('<option value="请选择城市">请选择城市</option>');
+        }else {
+            $("input[name='id']").val(id);
+            $("input[name='name']").val(name);
+            $("input[name='map[lng]']").val(lng);
+            $("input[name='map[lat]']").val(lat);
+            $("textarea[name='content']").val(content);
+            if(status==1){
+                $("input[name='status']").eq(1).prop('checked',1);
+            }else {
+                $("input[name='status']").eq(0).prop('checked',1);
+            }
+            cascdeInit("","",province,city,area,"");
+        }
+
+        $('#myModal').modal();
+    }
+
+    function del(id) {
+        if(confirm('是否删除？')){
+            location.href="{php echo $this->createWebUrl('hospital',array('del'=>1))}&id="+id;
+        }
+    }
+</script>
+
+{template 'common/footer'}

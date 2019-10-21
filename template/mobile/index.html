@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh-cn" class="hb-loaded">
+<head>
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0"/>
+    <title>个人中心</title>
+    <link rel="stylesheet" href="../addons/weihu_menpiao/static/sm.min.css">
+
+
+    <style>
+        #l-map{
+            height:400px;
+            width:100%;
+            float:left;
+        }
+        .inputstyle{
+
+            width: 100%;
+
+            height: 100%;
+
+            cursor: pointer;
+
+            font-size: 30px;
+
+            outline: medium none;
+
+            position: absolute;
+
+            filter:alpha(opacity=0);
+
+            -moz-opacity:0;
+
+            opacity:0;
+
+        }
+    </style>
+</head>
+
+<body>
+
+<header class="bar bar-nav">
+
+    <button class="button pull-left" onclick="location.href='{php echo $this->createMobileUrl('menu')}'">
+        返回
+    </button>
+
+    <button class="button pull-right" onclick="location.href='{php echo $this->createMobileUrl('shiming')}'">
+        实名认证
+    </button>
+    <h1 class='title'>个人中心</h1>
+</header>
+
+<div class="content">
+
+    <form action="" method="post" role="form" enctype="multipart/form-data" >
+
+        <div class="list-block">
+            <ul>
+                <!-- Text inputs -->
+                <li >
+                    <div class="item-content">
+                        <div class="item-media"><i class="icon icon-form-password"></i></div>
+                        <div class="item-inner">
+                            <div class="item-title label">昵称</div>
+                            <div class="item-input">
+                                <input type="text" name="nickname" placeholder="未获取到" readonly value="{$fans['nickname']}">
+                            </div>
+                        </div>
+                    </div>
+                </li>
+
+                <li >
+                    <div class="item-content">
+                        <div class="item-media"><i class="icon icon-form-name"></i></div>
+                        <div class="item-inner">
+                            <div class="item-title label">头像</div>
+                            <div class="item-input">
+                                <input type="hidden" name="avatar" value="{$fans['avatar']}" >
+                                <img src="{$fans['avatar']}" style="width: 50px;height: 50px;margin-top: 5px;">
+                            </div>
+                        </div>
+                    </div>
+                </li>
+
+                    <li>
+                        <div class="item-content">
+                            <div class="item-media"><i class="icon icon-form-name"></i></div>
+                            <div class="item-inner">
+                                <div class="item-title label">姓名</div>
+                                <div class="item-input">
+                                    <input type="text" name="name" value="{$member['name']}" placeholder="请输入真实姓名">
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+
+                    <li>
+                        <div class="item-content">
+                            <div class="item-media"><i class="icon icon-form-name"></i></div>
+                            <div class="item-inner">
+                                <div class="item-title label">手机号</div>
+                                <div class="item-input">
+                                    <input type="text" name="mobile" value="{$member['mobile']}" placeholder="请输入手机号" >
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+
+                <li>
+                    <div class="item-content">
+                        <div class="item-media"><i class="icon icon-form-name"></i></div>
+                        <div class="item-inner">
+                            <div class="item-title label">生日</div>
+                            <div class="item-input">
+                                <input type="text" name="birthday" id="birthday" value="{php echo $member['birthday']?date('Y-m-d',$member['birthday']):'请选择'}" readonly="">
+                            </div>
+                        </div>
+                    </div>
+                </li>
+
+            </ul>
+        </div>
+        <div class="content-block">
+            <!--<div class="row">-->
+                <!--<div class="col-33"><a href="javascript:duihuakuang();" class="button button-big button-fill button-success">保存</a></div>-->
+                <!--<div class="col-33"><a href="javascript:gouka();" class="button button-big button-fill button-warning" >购卡</a></div>-->
+                <!--<div class="col-33"><a href="javascript:guahao();" class="button button-big button-fill button-warning" >挂号</a></div>-->
+            <!--</div>-->
+            <p><a href="javascript:duihuakuang();" class="button button-big button-fill button-success">保存</a></p>
+        </div>
+
+    </form>
+</div>
+
+<script type='text/javascript' src='../addons/weihu_menpiao/static/zepto.min.js' charset='utf-8'></script>
+<script type='text/javascript' src='../addons/weihu_menpiao/static/sm.min.js' charset='utf-8'></script>
+<script>
+    $(function() {
+        Zepto("#birthday").calendar({
+            value: ["{php echo $member['birthday']?date('Y-m-d',$member['birthday']):date('Y-m-d',strtotime('-20 years'))}"]
+        });
+    })
+
+    function openBrowse(){
+        var evt = new MouseEvent("click", {
+            bubbles: false,
+            cancelable: true,
+            view: window
+        });
+        inputNode.dispatchEvent(evt);
+    }
+
+    function duihuakuang() {
+
+        var formData = new FormData();
+        formData.append("nickname", $.trim($("input[name='nickname']").val()));
+        formData.append("avatar", $.trim($("input[name='avatar']").val()));
+        formData.append("name", $.trim($("input[name='name']").val()));
+        formData.append("mobile", $.trim($("input[name='mobile']").val()));
+        formData.append("birthday", $.trim($("input[name='birthday']").val()));
+
+            $.ajax({
+                type: "POST",   //提交的方法
+                dataType:'json',
+                url:"", //提交的地址
+                data:formData,// 序列化表单值
+                async: false,
+                processData : false, // 使数据不做处理
+                contentType : false, // 不要设置Content-Type请求头
+                error: function(request) {  //失败的话
+                    Zepto.alert("网络错误");
+                },
+                success: function(data) {  //成功
+                    if(data.status==1){
+                        Zepto.alert('修改成功!')
+                    }else {
+                        Zepto.alert(data.msg)
+                    }
+                }
+            });
+
+    }
+
+    // function gouka() {
+    //     if(flag==1){
+    //         location.href="{php echo $this->createMobileUrl('membercard')}";
+    //     }else {
+    //         Zepto.alert('请先设置个人信息！')
+    //     }
+    // }
+    //
+    // function guahao() {
+    //     if(flag==1){
+    //         location.href="{php echo $this->createMobileUrl('guahao')}";
+    //     }else {
+    //         Zepto.alert('请先设置个人信息！')
+    //     }
+    // }
+
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh-cn" class="hb-loaded">
+<head>
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0"/>
+    <title>实名认证</title>
+    <link rel="stylesheet" href="../addons/weihu_menpiao/static/sm.min.css">
+
+
+    <style>
+        #l-map{
+            height:400px;
+            width:100%;
+            float:left;
+        }
+        .inputstyle{
+
+            width: 100%;
+
+            height: 100%;
+
+            cursor: pointer;
+
+            font-size: 30px;
+
+            outline: medium none;
+
+            position: absolute;
+
+            filter:alpha(opacity=0);
+
+            -moz-opacity:0;
+
+            opacity:0;
+
+        }
+    </style>
+</head>
+
+<body>
+
+<header class="bar bar-nav">
+
+    <button class="button pull-left" onclick="location.href='{php echo $this->createMobileUrl('menu')}'">
+        返回
+    </button>
+    <h1 class='title'>实名认证</h1>
+</header>
+
+<div class="content">
+
+    <form action="" method="post" role="form" enctype="multipart/form-data" >
+
+        <div class="list-block">
+            <ul>
+                <!-- Text inputs -->
+                <li >
+                    <div class="item-content">
+                        <div class="item-media"><i class="icon icon-form-password"></i></div>
+                        <div class="item-inner">
+                            <div class="item-title label">身份证号</div>
+                            <div class="item-input">
+                                <input type="text" name="idcardnum" placeholder="请填写身份证号" value="{$shiming['idcardnum']}">
+                            </div>
+                        </div>
+                    </div>
+                </li>
+
+                <li>
+                    <div class="item-content">
+                        <div class="item-media"><i class="icon icon-form-name"></i></div>
+                        <div class="item-inner">
+                            <div class="item-title label">照片</div>
+                            <div class="item-input" style="cursor:pointer;">
+                                <input type="file" id="fileElem" class="inputstyle" accept="image/*" name="imgfile1" >
+                                <img src="{if $shiming['photo']}{$shiming['photo']}{else}../addons/weihu_yuyue/uoload.png{/if}" onclick="openBrowse()" style="width: 50px;height: 50px;margin-top: 10px;cursor:pointer;" >
+                                <div class="content-block-title" style="float: right;">请上传本人照片</div>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+
+                <li >
+                    <div class="item-content">
+                        <div class="item-media"><i class="icon icon-form-password"></i></div>
+                        <div class="item-inner">
+                            <div class="item-title label">状态</div>
+                            <div class="item-input">
+                                <input type="text" readonly value="{php echo $shiming['status']==0?'待审核':($shiming['status']==1?'通过':'驳回')}">
+                            </div>
+                        </div>
+                    </div>
+                </li>
+
+            </ul>
+        </div>
+        <div class="content-block">
+            {if $shiming['status']==0}
+            <p><a href="javascript:;" class="button button-big button-fill button-success">审核中</a></p>
+            {else if $shiming['status']==1}
+            <p><a href="javascript:;" class="button button-big button-fill button-success">已通过</a></p>
+            {else}
+            <p><a href="javascript:duihuakuang();" class="button button-big button-fill button-success">提交</a></p>
+            {/if}
+
+        </div>
+
+    </form>
+</div>
+
+<script type="text/javascript" src="../web/resource/js/lib/jquery-1.11.1.min.js"></script>
+<script type='text/javascript' src='../addons/weihu_menpiao/static/zepto.min.js' charset='utf-8'></script>
+<script type='text/javascript' src='../addons/weihu_menpiao/static/sm.min.js' charset='utf-8'></script>
+<script>
+    $(function() {
+        $("input[name='imgfile1']").change(function () {
+            var file = this.files[0];
+            var r = new FileReader();
+            r.readAsDataURL(file);
+            $(r).load(function () {
+                $("input[name='imgfile1']").next().attr('src', this.result);
+            })
+        })
+    })
+
+    function openBrowse(){
+        var evt = new MouseEvent("click", {
+            bubbles: false,
+            cancelable: true,
+            view: window
+        });
+        inputNode.dispatchEvent(evt);
+    }
+
+    function duihuakuang() {
+
+        var formData = new FormData();
+        formData.append("idcardnum", $.trim($("input[name='idcardnum']").val()));
+        if(typeof $('#fileElem')[0]!='undefined'){
+            formData.append("imgfile1",$('#fileElem')[0].files[0]);
+        }
+
+        $.ajax({
+            type: "POST",   //提交的方法
+            dataType:'json',
+            url:"", //提交的地址
+            data:formData,// 序列化表单值
+            async: false,
+            processData : false, // 使数据不做处理
+            contentType : false, // 不要设置Content-Type请求头
+            error: function(request) {  //失败的话
+                Zepto.alert("网络错误");
+            },
+            success: function(data) {  //成功
+                if(data.status==1){
+                    Zepto.alert('提交成功!',function () {
+                        window.location.reload()
+                    })
+                }else {
+                    Zepto.alert(data.msg)
+                }
+            }
+        });
+
+    }
+
+</script>
+
+</body>
+
+</html>

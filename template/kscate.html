@@ -1,0 +1,242 @@
+{template 'common/header'}
+
+<div class="main">
+    <a href="{php echo $this->createWebUrl('hospital')}" class="btn btn-default pull-left">返回</a>
+    <a href="javascript:cupmodal(0);" class="btn btn-primary pull-left" style="margin-left: 20px" ><span>+</span>添加科室</a>
+    <div style="padding: 15px;">
+        <table class="table table-hover table-striped table-condensed">
+            <thead class="navbar-inner">
+            <tr>
+                <th style="text-align: left;">名称</th>
+                <th style="text-align: center;">备注</th>
+                <th style="text-align: center;">状态</th>
+                <th style="text-align: center;">操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            {loop $list $item}
+            <tr>
+                <td style="text-align: left;">{$item['name']}</td>
+                <td style="text-align: center;">{$item['content']}</td>
+                <td style="text-align: center;">{php echo empty($item['status'])?'显示':'隐藏'}</td>
+                <td style="text-align: center;">
+                    <a href="javascript:cupmodal({$item['id']},'{$item['name']}','{$item['sjid']}','{$item['content']}','{$item['status']}','{$item['ysmember']['name']}','{$item['ysopenid']}');"
+                       title="编辑" class="btn btn-small">编辑</a>
+                    <a href="javascript:del({$item['id']});"
+                       title="删除" class="btn btn-small">删除</a>
+                </td>
+            </tr>
+            {loop $item['xiaji'] $item2}
+            <tr>
+                <td style="text-align: left;">&nbsp;&nbsp;&nbsp;&nbsp;|——{$item2['name']}</td>
+                <td style="text-align: center;">{$item2['content']}</td>
+                <td style="text-align: center;">{php echo empty($item2['status'])?'显示':'隐藏'}</td>
+                <td style="text-align: center;">
+                    <a href="javascript:cupmodal({$item2['id']},'{$item2['name']}','{$item2['sjid']}','{$item2['content']}','{$item2['status']}','{$item2['ysmember']['name']}','{$item2['ysopenid']}');"
+                       title="编辑" class="btn btn-small">编辑</a>
+                    <a href="javascript:del({$item2['id']});"
+                       title="删除" class="btn btn-small">删除</a>
+                </td>
+            </tr>
+            {/loop}
+            {/loop}
+            </tbody>
+
+        </table>
+    </div>
+
+</div>
+
+<!-- 模态框（Modal） -->
+<style>
+    .modal-backdrop{
+        z-index: 400;
+    }
+    #myModal{
+        z-index: 500;
+    }
+    .we7-modal-dialog .modal-content, .modal-dialog .modal-content{
+        max-height: 1000px;
+    }
+</style>
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+     aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"
+                        aria-hidden="true">×
+                </button>
+            </div>
+            <form action="" method="post" class="form-horizontal">
+                <div class="modal-body" id="mo-content" >
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label must">名称</label>
+                        <div class="col-sm-4 col-xs-6" >
+                            <input type="text" name="name" id="name" class="form-control" value="" data-rule-required="true" />
+                        </div>
+                    </div>
+
+                    <div class="form-group" id="sjid">
+                        <label class="col-sm-2 control-label must">上级科室</label>
+                        <div class="col-sm-4 col-xs-6" >
+                            <select class="form-control" name="sjid">
+                                <option value="">作为父级栏目</option>
+                                {loop $list $v}
+                                <option value="{$v['id']}">{$v['name']}</option>
+                                {/loop}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group" id="glys" >
+                        <label class="col-sm-2 control-label must">关联医生</label>
+                        <div class="col-sm-4 col-xs-6" >
+                            <div class="input-group">
+                                <input type="text" id="ysname" class="form-control">
+                                <input type="hidden" id="ysopenid" name="ysopenid"  >
+                                <span class="input-group-btn"><button class="btn btn-default" type="button" onclick="chosemember()" >选择</button></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">备注</label>
+                        <div class="col-sm-8 col-xs-6" >
+                            <textarea name="content" class="form-control" ></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">状态</label>
+                        <div class="col-sm-4 col-xs-6" >
+                            <label class="radio-inline"><input type="radio" name="status" value="0" aria-invalid="false" class="valid">显示</label>
+                            <label class="radio-inline"><input type="radio" name="status" value="1" aria-invalid="false" class="valid">隐藏</label>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <input type="hidden" name="id" value="" >
+                    <input type="hidden" name="hid" value="{$_GPC['hid']}" >
+                    <button type="submit" class="btn btn-primary">提交更改</button>
+                </div>
+            </form>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<div class="modal fade" id="myModal2" tabindex="-1" role="dialog"
+     aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"
+                        aria-hidden="true">×
+                </button>
+            </div>
+                <div class="modal-body" >
+
+                    <table class="table table-hover">
+                        <caption>
+                            <div class="input-group">
+                                <input type="text" id="search" class="form-control">
+                                <span class="input-group-btn"><button class="btn btn-default" type="button" onclick="getmember()" placeholder="输入名称或手机号" >搜索</button></span>
+                            </div>
+                        </caption>
+                        <thead>
+                        <tr>
+                            <th>名称</th>
+                            <th>手机号</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody id="ystbody" >
+
+                        </tbody>
+                    </table>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<script>
+    function cupmodal(id,name,sjid,content,status,ysname,ysopenid) {
+        if(id==0){
+            $("input[name='id']").val('');
+            $("input[name='name']").val('');
+            $("select[name='sjid']").val('');
+            $("#ysname").val('');
+            $("#ysopenid").val('');
+            $("textarea[name='content']").val('');
+            $("input[name='status']").eq(0).prop('checked',1);
+            $("#sjid").show();
+            $("#glys").show();
+        }else {
+            $("input[name='id']").val(id);
+            $("input[name='name']").val(name);
+            $("select[name='sjid']").val(sjid);
+            $("#ysname").val(ysname);
+            $("#ysopenid").val(ysopenid);
+            $("textarea[name='content']").val(content);
+            if(status==1){
+                $("input[name='status']").eq(1).prop('checked',1);
+            }else {
+                $("input[name='status']").eq(0).prop('checked',1);
+            }
+            if(sjid==0){
+                $("#sjid").hide();
+                $("#glys").hide();
+            }else {
+                $("#sjid").show();
+                $("#glys").show();
+            }
+        }
+
+
+        $('#myModal').modal();
+    }
+
+    function del(id) {
+        if(confirm('是否删除？')){
+            location.href="{php echo $this->createWebUrl('kscate',array('del'=>1,'hid'=>$_GPC['hid']))}&id="+id;
+        }
+    }
+
+    function chosemember() {
+        $('#myModal2').modal();
+    }
+    function getmember() {
+        var url="{php echo $this->createWebUrl('getmemberajax')}";
+        var keyword=$('#search').val();
+        $.post(url,{keyword:keyword},function (res) {
+            if(res==0){
+                alert('请输入关键词！')
+            }else {
+                var data=eval('('+res+')');
+                var yshtml='';
+                data.forEach(function (value) {
+                    yshtml+='<tr>\n' +
+                        '                            <td>'+value.name+'</td>\n' +
+                        '                            <td>'+value.mobile+'</td>\n' +
+                        '                            <td><button class="btn btn-success" type="button" onclick="okmember(\''+value.name+'\',\''+value.openid+'\')" >选择</button></td>\n' +
+                        '                        </tr>'
+                })
+                $("#ystbody").html(yshtml);
+            }
+        })
+    }
+    function okmember(name,openid) {
+        $('#ysname').val(name);
+        $('#ysopenid').val(openid);
+        $('#myModal2').modal('hide');
+    }
+</script>
+
+{template 'common/footer'}

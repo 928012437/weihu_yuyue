@@ -1,0 +1,118 @@
+{template 'common/header'}
+
+<ul class="nav nav-tabs">
+    <form action=""  method="post" >
+        <input type="text" name="keyword" class="form-control" style="width:25%;float:left;" value="{$_GPC['keyword']}" placeholder="输入卡号" >
+
+        {php echo tpl_form_field_daterange('time', array('start'=>date('Y-m-d',(empty($_GPC['time']['start'])?strtotime('-1 month'):strtotime($_GPC['time']['start']))),'end'=>date('Y-m-d',(empty($_GPC['time']['end'])?strtotime('+1 day'):strtotime($_GPC['time']['end'])))));}
+
+        <button type="submit" class="btn btn-default" >搜索</button>
+    </form>
+
+</ul>
+
+<div class="main">
+    {if !empty($_GPC['mid'])}
+    <a href="{php echo $this->createWebUrl('member')}" class="btn btn-default pull-left">返回</a>
+    {/if}
+    <a href="{php echo $this->createWebUrl('membercardexport',array('mid'=>$_GPC['mid']))}" class="btn btn-primary pull-left" style="margin-left: 20px" ><span>+</span>导出</a>
+
+    <div style="padding: 15px;">
+        <table class="table table-hover table-striped table-condensed">
+            <thead class="navbar-inner">
+            <tr>
+                <th style="text-align: center;">卡号</th>
+                {if empty($_GPC['mid'])}
+                <th style="text-align: center;">姓名</th>
+                <th style="text-align: center;">手机号</th>
+                <th style="text-align: center;">生日</th>
+                {/if}
+                <th style="text-align: center;">卡名</th>
+                <th style="text-align: center;">时长</th>
+                <th style="text-align: center;">次数</th>
+                <th style="text-align: center;">开始时间</th>
+                <th style="text-align: center;">结束时间</th>
+                <th style="text-align: center;">价格</th>
+                <th style="text-align: center;">备注</th>
+                <th style="text-align: center;">操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            {loop $list $item}
+            <tr>
+                <td style="text-align: center;">{$item['cardnum']}</td>
+                {if empty($_GPC['mid'])}
+                <td style="text-align: center;">{$item['member']['name']}</td>
+                <td style="text-align: center;">{$item['member']['mobile']}</td>
+                <td style="text-align: center;">{php echo $item['member']['birthday']?date('Y-m-d',$item['member']['birthday']):'未设置'}</td>
+                {/if}
+                <td style="text-align: center;">{$item['name']}({php echo $item['type']==1?'线上购买':'实体卡激活'})</td>
+                <td style="text-align: center;">{php echo intval(($item['endtime']-time())/(24*60*60))+1}/{$item['daynum']}</td>
+                <td style="text-align: center;">{$item['snum']}/{$item['num']}</td>
+                <td style="text-align: center;">{php echo date('Y-m-d H:i',$item['starttime'])}</td>
+                <td style="text-align: center;">{php echo date('Y-m-d H:i',$item['endtime'])}</td>
+                <td style="text-align: center;">{$item['price']}</td>
+                <td style="text-align: center;">{$item['content']}</td>
+                <td style="text-align: center;">
+                    <a href="javascript:cupmodal({$item['id']},'{$item['snum']}','{$item['content']}');"
+                       title="编辑" class="btn btn-small">编辑</a>
+                </td>
+            </tr>
+            {/loop}
+            </tbody>
+
+        </table>
+        {$pager}
+    </div>
+
+</div>
+
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+     aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"
+                        aria-hidden="true">×
+                </button>
+            </div>
+            <form action="" method="post" class="form-horizontal">
+                <div class="modal-body" id="mo-content" >
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">剩余次数</label>
+                        <div class="col-sm-8 col-xs-6" >
+                            <input type="number" name="snum" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">备注</label>
+                        <div class="col-sm-8 col-xs-6" >
+                            <textarea name="content" class="form-control" ></textarea>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <input type="hidden" name="id" value="" >
+                    <input type="hidden" name="mid" value="{$_GPC['mid']}" >
+                    <input type="hidden" name="change" value="1">
+                    <button type="submit" class="btn btn-primary">提交更改</button>
+                </div>
+            </form>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<script>
+    function cupmodal(id,snum,content) {
+            $("input[name='id']").val(id);
+            $("input[name='snum']").val(snum);
+            $("textarea[name='content']").val(content);
+        $('#myModal').modal();
+    }
+</script>
+
+{template 'common/footer'}

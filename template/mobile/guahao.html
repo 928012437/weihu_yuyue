@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="zh-cn" class="hb-loaded">
+<head>
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0"/>
+    <title>挂号</title>
+    <link rel="stylesheet" href="../addons/weihu_menpiao/static/sm.min.css">
+    <style>
+        .list-block{
+            margin: 10px 0;
+        }
+    </style>
+</head>
+
+<body>
+<div class="page-group">
+    <div class="page" >
+        <header class="bar bar-nav">
+            <button class="button pull-left" onclick="location.href='{php echo $this->createMobileUrl('menu')}'">
+                返回
+            </button>
+            <button class="button pull-right" onclick="buycard()">
+                挂号记录
+            </button>
+            <h1 class='title'>挂号</h1>
+        </header>
+
+        <div class="content">
+            <form action="" method="post" role="form" enctype="multipart/form-data" >
+
+                <div class="buttons-tab">
+                    {loop $mcards $k $c}
+                    <a href="#tab{php echo $k+1}" class="tab-link {if $k==0}{php $cardid=$c['id']}{php $cardprice=$c['price']}active{/if} button" onclick="changecardid({$c['id']})" >{$c['name']}</a>
+                    {/loop}
+                </div>
+                <div class="content-block">
+                    <div class="tabs">
+                        {loop $mcards $k $c}
+                        <div id="tab{php echo $k+1}" class="tab {if $k==0}active{/if}">
+                            <div class="list-block">
+                                <ul>
+                                    <li>
+                                        <div class="item-content">
+                                            <div class="item-media"><i class="icon icon-form-name"></i></div>
+                                            <div class="item-inner">
+                                                <img src="{media $cards[$c['cid']]['thumb']}" style="width: 100%;height: auto;" >
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="item-content">
+                                            <div class="item-media"><i class="icon icon-form-name"></i></div>
+                                            <div class="item-inner">
+                                                <div class="item-title label">卡号</div>
+                                                <div class="item-input">
+                                                    <input type="text" id="cardnum" readonly value="{$c['cardnum']}" >
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="item-content">
+                                            <div class="item-media"><i class="icon icon-form-name"></i></div>
+                                            <div class="item-inner">
+                                                <div class="item-title label">剩余天数</div>
+                                                <div class="item-input">
+                                                    <input type="text" id="sdaynum" readonly value="{php echo intval(($c['endtime']-time())/(24*60*60))+1}" >
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="item-content">
+                                            <div class="item-media"><i class="icon icon-form-name"></i></div>
+                                            <div class="item-inner">
+                                                <div class="item-title label">剩余次数</div>
+                                                <div class="item-input">
+                                                    <input type="text" id="snum" readonly value="{$c['snum']}" >
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+
+
+                                </ul>
+                            </div>
+                        </div>
+                        {/loop}
+                    </div>
+                </div>
+
+                <div class="content-block">
+                    <div class="list-block">
+                        <ul>
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-media"><i class="icon icon-form-name"></i></div>
+                                    <div class="item-inner">
+                                        <div class="item-title label">选择医院</div>
+                                        <div class="item-input">
+                                            <input type="text" name="hid" id="hid" value="加载中" readonly="">
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-media"><i class="icon icon-form-name"></i></div>
+                                    <div class="item-inner">
+                                        <div class="item-title label">选择科室</div>
+                                        <div class="item-input">
+                                            <input type="text" name="kscate" id="kscate" value="加载中" readonly="" style="width: 49%;float: left;" >
+                                            <input type="text" name="kscate2" id="kscate2" value="加载中" readonly="" style="width: 49%;float: left;" >
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-media"><i class="icon icon-form-name"></i></div>
+                                    <div class="item-inner">
+                                        <div class="item-title label">预约类型</div>
+                                        <div class="item-input">
+                                            <input type="text" name="yytype" id="yytype" placeholder="加载中" readonly="">
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-media"><i class="icon icon-form-name"></i></div>
+                                    <div class="item-inner">
+                                        <div class="item-title label">就医时间</div>
+                                        <div class="item-input">
+                                            <input type="text" name="seektime" id="seektime" value="请选择" readonly="">
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <p class="row">
+                        <input type="hidden" id="cardid" name="cardid" value="{$cardid}">
+                    <div ><a href="javascript:paycard()" class="button button-big button-fill button-success">立即预约</a></div>
+                    </p>
+                </div>
+
+            </form>
+        </div>
+
+    </div>
+</div>
+
+<script type='text/javascript' src='../addons/weihu_menpiao/static/zepto.min.js' charset='utf-8'></script>
+<script type='text/javascript' src='../addons/weihu_menpiao/static/sm.min.js' charset='utf-8'></script>
+<script type="text/javascript" src="https://api.map.baidu.com/api?v=2.0&ak=ErEPjxGABw5FB7HgxbbRde5KTgVFdVns&s=1"></script>
+<script>
+    $(function() {
+        flag=false;
+        flag2=false;
+        var geolocation = new BMap.Geolocation();
+        geolocation.getCurrentPosition(function (r) {
+            if (this.getStatus() == BMAP_STATUS_SUCCESS) {
+                var lat = r.point.lat;
+                var lng = r.point.lng;
+            }
+
+            var url="{php echo $this->createMobileUrl('gethospital')}";
+            Zepto.post(url,{lat:lat,lng:lng},function (res) {
+                var resarr=eval('('+res+')');
+                var hosidarr=[];
+                var hosarr=[];
+                resarr.forEach(function (item,index) {
+                    hosidarr.push(item.id);
+                    hosarr.push(item.name+'('+item.distance+"公里)");
+                });
+
+                if(res!=''){
+                    Zepto("#hid").attr('data-id',hosidarr[0]);
+                    Zepto("#hid").val(hosarr[0]);
+                    getkscate();
+                    Zepto("#hid").picker({
+                        toolbarTemplate: '<header class="bar bar-nav">\
+  <button class="button button-link pull-right close-picker">确定</button>\
+  <h1 class="title">选择医院</h1>\
+  </header>',
+                        cols: [
+                            {
+                                textAlign: 'center',
+                                values: hosidarr,
+                                displayValues:hosarr
+                            }
+                        ],
+                        value:hosidarr[0],
+                        formatValue: function (picker, value, displayValues){return displayValues[0]},
+                        onClose: function (picker, values, displayValues) {
+                            Zepto("#hid").attr('data-id',picker.value[0]);
+                            getkscate();
+                        }
+                    });
+                }else {
+                    Zepto.alert('网络错误')
+                }
+            })
+        })
+
+        var yytypearr=[];
+        {loop $yytype $v}
+        yytypearr.push('{$v}');
+        {/loop}
+
+        Zepto("#yytype").val('{$yytype[0]}');
+
+        Zepto("#yytype").picker({
+            toolbarTemplate: '<header class="bar bar-nav">\
+  <button class="button button-link pull-right close-picker">确定</button>\
+  <h1 class="title">选择预约类型</h1>\
+  </header>',
+            cols: [
+                {
+                    textAlign: 'center',
+                    values: yytypearr,
+                }
+            ],
+            onClose: function (picker, values, displayValues) {
+                Zepto("#yytype").attr('data-id',picker.value[0]);
+            }
+        });
+    Zepto("#seektime").datetimePicker();
+    })
+
+    function getkscate() {
+        var hid=Zepto("#hid").attr('data-id');
+        var url="{php echo $this->createMobileUrl('getkscate')}";
+        flag=true;
+        Zepto.post(url,{hid:hid},function (res) {
+            var resarr=eval('('+res+')');
+            var kscateidarr=[];
+            var kscatearr=[];
+            resarr.forEach(function (item) {
+                kscateidarr.push(item.id);
+                kscatearr.push(item.name);
+            });
+
+            if(res!=''){
+            Zepto("#kscate").attr('data-id',kscateidarr[0]);
+            Zepto("#kscate").val(kscatearr[0]);
+            getkscate2();
+            Zepto("#kscate").picker({
+                toolbarTemplate: '<header class="bar bar-nav">\
+  <button class="button button-link pull-right close-picker">确定</button>\
+  <h1 class="title">选择科室</h1>\
+  </header>',
+                cols: [
+                    {
+                        textAlign: 'center',
+                        values: kscateidarr,
+                        displayValues:kscatearr
+                    }
+                ],
+                value:kscateidarr[0],
+                formatValue: function (picker, value, displayValues){return displayValues[0]},
+                onOpen:function (picker) {
+                    if(flag){
+                        var hid=Zepto("#hid").attr('data-id');
+                        var url="{php echo $this->createMobileUrl('getkscate')}";
+                        Zepto.post(url,{hid:hid},function (res) {
+                            var resarr = eval('(' + res + ')');
+                            var kscateidarr=[];
+                            var kscatearr = [];
+                            resarr.forEach(function (item) {
+                                kscateidarr.push(item.id);
+                                kscatearr.push(item.name);
+                            });
+                            picker.cols[0].replaceValues(kscateidarr,kscatearr);
+                            picker.updateValue();
+                        })
+                        flag=false;
+                    }
+
+                },
+                onClose: function (picker, values, displayValues) {
+                    Zepto("#kscate").attr('data-id',picker.value[0]);
+                    getkscate2();
+                }
+            });
+            }else {
+                Zepto.alert('网络错误')
+            }
+        })
+    }
+
+    function getkscate2() {
+        var hid=Zepto("#hid").attr('data-id');
+        var sjid=Zepto("#kscate").attr('data-id');
+        var url="{php echo $this->createMobileUrl('getkscate2')}";
+        flag2=true;
+        Zepto.post(url,{hid:hid,sjid:sjid},function (res) {
+            var resarr=eval('('+res+')');
+            var kscateidarr=[];
+            var kscatearr=[];
+            resarr.forEach(function (item) {
+                kscateidarr.push(item.id);
+                kscatearr.push(item.name);
+            });
+
+            if(res!=''){
+                Zepto("#kscate2").attr('data-id',kscateidarr[0]);
+                Zepto("#kscate2").val(kscatearr[0]);
+                Zepto("#kscate2").picker({
+                    toolbarTemplate: '<header class="bar bar-nav">\
+  <button class="button button-link pull-right close-picker">确定</button>\
+  <h1 class="title">选择科室</h1>\
+  </header>',
+                    cols: [
+                        {
+                            textAlign: 'center',
+                            values: kscateidarr,
+                            displayValues:kscatearr
+                        }
+                    ],
+                    value:kscateidarr[0],
+                    formatValue: function (picker, value, displayValues){return displayValues[0]},
+                    onOpen:function (picker) {
+                        if(flag2){
+                            var hid=Zepto("#hid").attr('data-id');
+                            var sjid=Zepto("#kscate").attr('data-id');
+                            var url="{php echo $this->createMobileUrl('getkscate2')}";
+                            Zepto.post(url,{hid:hid,sjid:sjid},function (res) {
+                                var resarr = eval('(' + res + ')');
+                                var kscateidarr=[];
+                                var kscatearr = [];
+                                resarr.forEach(function (item) {
+                                    kscateidarr.push(item.id);
+                                    kscatearr.push(item.name);
+                                });
+                                picker.cols[0].replaceValues(kscateidarr,kscatearr);
+                                picker.updateValue();
+                            })
+                            flag2=false;
+                        }
+
+                    },
+                    onClose: function (picker, values, displayValues) {
+                        Zepto("#kscate2").attr('data-id',picker.value[0]);
+                    }
+                });
+            }else {
+                Zepto.alert('网络错误')
+            }
+        })
+    }
+
+    function paycard() {
+        Zepto.confirm('是否确定?', function () {
+            var formData = new FormData();
+            formData.append("hid", $.trim($("input[name='hid']").attr('data-id')));
+            formData.append("ksid", $.trim($("input[name='kscate']").attr('data-id')));
+            formData.append("ksid2", $.trim($("input[name='kscate2']").attr('data-id')));
+            formData.append("seektime", $.trim($("input[name='seektime']").val()));
+            formData.append("mcardid", $.trim($("input[name='cardid']").val()));
+            formData.append("yytype", $.trim($("input[name='yytype']").attr('data-id')));
+
+            $.ajax({
+                type: "POST",   //提交的方法
+                dataType:'json',
+                url:"", //提交的地址
+                data:formData,// 序列化表单值
+                async: false,
+                processData : false, // 使数据不做处理
+                contentType : false, // 不要设置Content-Type请求头
+                error: function(request) {  //失败的话
+                    Zepto.alert("网络错误");
+                },
+                success: function(data) {  //成功
+                    if(data.status==1){
+                        Zepto.alert('预约成功!',function (){
+                    location.href="{php echo $this->createMobileUrl('order')}";
+                        })
+                    }else {
+                        Zepto.alert(data.msg)
+                    }
+                }
+            });
+        })
+    }
+
+    function buycard() {
+        location.href="{php echo $this->createMobileUrl('order')}";
+    }
+    function changecardid(cardid) {
+        $("#cardid").val(cardid);
+    }
+
+</script>
+</body>
+
+</html>
